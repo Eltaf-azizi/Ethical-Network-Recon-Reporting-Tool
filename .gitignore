@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Environments
+.venv/
+venv/
+env/
+
+# Generated reports
+reports/*
+!reports/.gitkeep
+*.html
+!ethscan/templates/**/*.html.j2
+*.pdf
+
+# Real scope files — never commit
+scope.json
+scope.local.json
+!scope.example.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+*.swp
