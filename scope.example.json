@@ -1,0 +1,7 @@
+{
+  "authorized_by": "Your Name (system owner)",
+  "issued": "2025-01-01",
+  "expires": "2030-12-31",
+  "targets": ["127.0.0.1", "localhost", "192.168.56.10"],
+  "consent": "I confirm I own or have written permission to test every target listed here. I will scan only within the agreed time window and will handle results responsibly."
+}
