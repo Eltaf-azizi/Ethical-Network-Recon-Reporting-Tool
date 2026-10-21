@@ -1,0 +1,35 @@
+[project]
+name = "ethscan"
+version = "1.0.0"
+description = "Ethical network reconnaissance and reporting tool"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Eltaf" }]
+dependencies = ["jinja2>=3.1,<4"]
+
+[project.scripts]
+ethscan = "ethscan.cli:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["ethscan*"]
+
+[tool.setuptools.package-data]
+ethscan = ["templates/*.j2", "templates/partials/*.j2"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+warn_unused_ignores = true
