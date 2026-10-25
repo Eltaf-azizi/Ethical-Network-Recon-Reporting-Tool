@@ -26,3 +26,46 @@ Unauthorised scanning is illegal in many jurisdictions:
 
 Even where scanning is not criminal, it may breach a provider's terms of
 service (cloud, ISP, hosting) and get your account terminated.
+
+## What the gate does
+
+1. **`--authorized` is required.** No exceptions.
+2. **Loopback targets** (`127.0.0.1`, `localhost`, `::1`) are exempt from the
+   scope-file requirement because they cannot affect any third party. The
+   `--authorized` flag is still required.
+3. **Non-loopback targets** require a scope file (`--scope <file>`) that
+   names the target in a `targets` list. If the target isn't listed, the tool
+   refuses to run.
+4. **Expired scopes are refused.** If a scope has an `expires` date in the
+   past, the tool refuses to run.
+
+None of this is encryption. A determined operator can edit the source. The
+gate exists to make unauthorised use *deliberate* rather than accidental.
+
+## What the tool does NOT do
+
+- No SYN (half-open) scan. That requires raw sockets and root, and is more
+  aggressive.
+- No OS fingerprinting beyond heuristics from banners. No Nmap-style
+  TCP/IP fingerprinting.
+- No exploit attempts, no payloads, no file transfers.
+- No credential guessing, no brute force.
+
+These are deliberate omissions. Every one of them would push the tool from
+"reconnaissance" toward "attack."
+
+## Operator responsibilities
+
+If you run `ethscan` against anything other than loopback, you are asserting:
+
+1. You own the target, **or**
+2. You have **written permission** that names the target and the time window.
+
+And you must:
+
+- Scan only within that scope.
+- Store results securely.
+- Report findings responsibly.
+- Not act on findings without authorisation.
+
+If you are unsure, **stop and ask**.
