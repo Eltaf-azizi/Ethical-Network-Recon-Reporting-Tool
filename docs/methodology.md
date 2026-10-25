@@ -25,3 +25,33 @@ application uses, requires no elevated privileges, and leaves a clear trail.
 The `filtered` distinction matters: a "closed" port is a definite answer; a
 "filtered" port is an absence of information. Reports should never conflate
 the two.
+
+## Rate limiting
+
+Two independent limits are enforced:
+
+1. **Semaphore (concurrency).** Caps how many connections are in flight at
+   once. Protects *the scanner* from running out of file descriptors.
+2. **Token bucket (rate).** Caps how many new connections are attempted per
+   second. Protects *the target* from being flooded.
+
+The token bucket holds up to `rate` tokens and refills at `rate` per second.
+Each connection consumes one token. If no token is available, the caller
+sleeps.
+
+## Banner grabbing
+
+Once a port is confirmed open, the scanner opens a **second connection** and
+attempts to read a banner. For TLS ports it negotiates a handshake and reports
+the cipher and protocol version. For HTTP ports it sends a `HEAD` request. For
+Redis it sends `PING`. For everything else it does a generic read and a small
+nudge.
+
+Banner grabbing is a second connection. If you are counting connections, a
+scan of *N* ports where *M* are open uses N + M connections.
+
+## OS hint
+
+The OS hint is derived from substrings in banners — `ubuntu`, `debian`,
+`windows`, `freebsd`, etc. It is explicitly labelled as a hint and reported
+with a confidence level. It is **not** a fingerprint. Do not treat it as one.
