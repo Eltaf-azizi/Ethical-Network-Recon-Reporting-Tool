@@ -1,0 +1,35 @@
+CLI invoked
+   |
+   v
+Parse arguments
+   |
+   v
++--------------------------+
+| Authorization gate       |
+| - --authorized present?  |
+| - loopback OR scope ok?  |
+| - scope unexpired?       |
++-----------+--------------+
+            |
+   refused  |  allowed
+   ---------+--------
+   |                 |
+   v                 v
+Exit 2          Parse port spec
+                     |
+                     v
+              Resolve target (DNS)
+                     |
+                     v
+                  Scan ports
+                     |
+                     v
+              Build report data
+                     |
+                     v
+        Render HTML  ->  write file
+             |
+             +--> write JSON (optional)
+                     |
+                     v
+                  Exit 0
