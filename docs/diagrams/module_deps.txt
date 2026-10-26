@@ -1,0 +1,8 @@
+cli        -> auth, scanner, services, report, utils, constants, exceptions
+scanner    -> services
+services   -> constants, utils
+auth       -> constants
+report     -> (stdlib + jinja2)
+utils      -> constants, exceptions
+constants  -> (nothing)
+exceptions -> (nothing)
