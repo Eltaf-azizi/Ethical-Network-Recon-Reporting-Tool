@@ -44,3 +44,38 @@ def build_report_data(
         "summary": summary,
     }
 
+
+def render_html(report_data: dict, template_dir: str | Path) -> str:
+    """Render the HTML report. Autoescaping is ON."""
+    env = Environment(
+        loader=FileSystemLoader(str(template_dir)),
+        autoescape=select_autoescape(["html", "xml"]),
+        trim_blocks=True,
+        lstrip_blocks=True,
+    )
+    template = env.get_template("report.html.j2")
+    open_results = [r for r in report_data["results"] if r.state == "open"]
+    return template.render(report=report_data, open_results=open_results)
+
+
+def write_html(html: str, output_path: str | Path) -> None:
+    path = Path(output_path)
+    if path.parent and str(path.parent) not in ("", "."):
+        path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(html, encoding="utf-8")
+
+
+def write_json(report_data: dict, output_path: str | Path) -> None:
+    path = Path(output_path)
+    if path.parent and str(path.parent) not in ("", "."):
+        path.parent.mkdir(parents=True, exist_ok=True)
+
+    def default(obj):
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+        if hasattr(obj, "__dict__"):
+            return obj.__dict__
+        return str(obj)
+
+    with path.open("w", encoding="utf-8") as f:
+        json.dump(report_data, f, default=default, indent=2)
