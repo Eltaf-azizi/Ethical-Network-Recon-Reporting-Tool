@@ -49,3 +49,30 @@ def parse_port_spec(spec: str) -> list[int]:
         raise PortSpecError("port spec produced no ports")
 
     return sorted(ports)
+
+
+def utcnow() -> datetime:
+    """Timezone-aware current UTC time."""
+    return datetime.now(timezone.utc)
+
+
+def humanize_duration(seconds: float) -> str:
+    """Turn a float number of seconds into a compact human string."""
+    if seconds < 1:
+        return f"{seconds * 1000:.0f} ms"
+    if seconds < 60:
+        return f"{seconds:.2f} s"
+    minutes, sec = divmod(seconds, 60)
+    if minutes < 60:
+        return f"{int(minutes)}m {sec:.0f}s"
+    hours, minutes = divmod(minutes, 60)
+    return f"{int(hours)}h {int(minutes)}m"
+
+
+def safe_truncate(s: str, limit: int) -> str:
+    """Truncate a string, adding an ellipsis if it was cut."""
+    if s is None:
+        return ""
+    if len(s) <= limit:
+        return s
+    return s[:limit] + "…"
