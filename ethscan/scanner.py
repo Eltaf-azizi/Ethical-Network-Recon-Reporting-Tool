@@ -102,3 +102,25 @@ async def scan_single_port(
             return ScanResult(port=port, state="error", error=str(e))
         except Exception as e:
             return ScanResult(port=port, state="error", error=repr(e))
+
+
+
+async def scan_ports(
+    host: str,
+    ports: list[int],
+    timeout: float = 1.0,
+    concurrency: int = 200,
+    rate: float = 500.0,
+    banners: bool = True,
+) -> list[ScanResult]:
+    """Scan a list of ports concurrently. Returns results in input order."""
+    sem = asyncio.Semaphore(concurrency)
+    limiter = RateLimiter(rate)
+    tasks = [
+        asyncio.create_task(
+            scan_single_port(host, port, timeout, sem, limiter, banners)
+        )
+        for port in ports
+    ]
+    return await asyncio.gather(*tasks)
+    
