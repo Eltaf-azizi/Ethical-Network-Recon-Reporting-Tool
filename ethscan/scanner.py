@@ -51,3 +51,54 @@ class RateLimiter:
                 wait = (1.0 - self.tokens) / self.rate
             await asyncio.sleep(wait)
 
+
+
+async def scan_single_port(
+    host: str,
+    port: int,
+    timeout: float,
+    sem: asyncio.Semaphore,
+    limiter: RateLimiter,
+    banners: bool,
+) -> ScanResult:
+    # Rate-limit BEFORE taking the semaphore, so a burst of fast timeouts
+    # can't sneak past the target's budget by racing through the semaphore.
+    await limiter.acquire()
+
+    async with sem:
+        start = time.monotonic()
+        try:
+            reader, writer = await asyncio.wait_for(
+                asyncio.open_connection(host, port), timeout=timeout
+            )
+            latency_ms = (time.monotonic() - start) * 1000.0
+            service = service_for_port(port)
+
+            # Close the probe connection before banner-grabbing so the
+            # open/closed decision is not conflated with banner traffic.
+            try:
+                writer.close()
+                await writer.wait_closed()
+            except Exception:
+                pass
+
+            banner = ""
+            if banners:
+                banner = await grab_banner(host, port, timeout)
+
+            return ScanResult(
+                port=port,
+                state="open",
+                latency_ms=round(latency_ms, 2),
+                service=service,
+                banner=banner,
+            )
+
+        except asyncio.TimeoutError:
+            return ScanResult(port=port, state="filtered", error="timeout")
+        except ConnectionRefusedError:
+            return ScanResult(port=port, state="closed", error="connection refused")
+        except OSError as e:
+            return ScanResult(port=port, state="error", error=str(e))
+        except Exception as e:
+            return ScanResult(port=port, state="error", error=repr(e))
