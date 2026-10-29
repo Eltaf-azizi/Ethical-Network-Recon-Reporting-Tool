@@ -150,3 +150,48 @@ def main(argv: list[str] | None = None) -> int:
         return EXIT_INTERRUPTED
 
     finished = utcnow()
+
+
+    # --- 5) OS hint ---------------------------------------------------
+    os_hint = infer_os(results)
+
+    # --- 6) Report ----------------------------------------------------
+    options = {
+        "timeout": args.timeout,
+        "concurrency": args.concurrency,
+        "rate": args.rate,
+        "banners": not args.no_banners,
+        "port_spec": args.ports,
+    }
+
+    report_data = build_report_data(
+        target=args.target,
+        resolved_ip=resolved_ip,
+        started=started,
+        finished=finished,
+        results=results,
+        scope_info=scope_info,
+        os_hint=os_hint,
+        options=options,
+        tool_version=__version__,
+    )
+
+    html = render_html(report_data, TEMPLATE_DIR)
+    write_html(html, args.output)
+    print(f"[+] HTML report written: {args.output}")
+
+    if args.json_path:
+        write_json(report_data, args.json_path)
+        print(f"[+] JSON report written: {args.json_path}")
+
+    s = report_data["summary"]
+    print(
+        f"[+] Done in {report_data['duration_seconds']}s — "
+        f"open={s['open']} closed={s['closed']} "
+        f"filtered={s['filtered']} error={s['error']}"
+    )
+    return EXIT_OK
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
