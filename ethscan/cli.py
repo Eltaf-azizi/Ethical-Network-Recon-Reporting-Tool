@@ -92,3 +92,61 @@ def build_parser() -> argparse.ArgumentParser:
         "--version", action="version", version=f"ethscan {__version__}",
     )
     return p
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = build_parser()
+    args = parser.parse_args(argv)
+
+    # --- 1) Authorization gate ----------------------------------------
+    allowed, scope_info = check_authorization(
+        target=args.target,
+        authorized_flag=args.authorized,
+        scope_path=args.scope,
+    )
+    if not allowed:
+        print(f"[!] {scope_info}", file=sys.stderr)
+        return EXIT_REFUSED
+
+    # --- 2) Port parsing (no network yet) -----------------------------
+    try:
+        ports = parse_port_spec(args.ports)
+    except PortSpecError as e:
+        print(f"[!] Invalid port spec: {e}", file=sys.stderr)
+        return EXIT_REFUSED
+
+    # --- 3) DNS resolution (first network activity) -------------------
+    resolved_ip: str | None = None
+    try:
+        resolved_ip = socket.gethostbyname(args.target)
+    except Exception:
+        resolved_ip = None
+
+    # --- 4) Scan ------------------------------------------------------
+    started = utcnow()
+    print(
+        f"[*] Scanning {args.target}"
+        + (f" ({resolved_ip})" if resolved_ip else "")
+        + f" — {len(ports)} port(s)"
+    )
+    print(
+        f"[*] timeout={args.timeout}s concurrency={args.concurrency} "
+        f"rate={args.rate}/s banners={'off' if args.no_banners else 'on'}"
+    )
+
+    try:
+        results = asyncio.run(
+            scan_ports(
+                host=args.target,
+                ports=ports,
+                timeout=args.timeout,
+                concurrency=args.concurrency,
+                rate=args.rate,
+                banners=not args.no_banners,
+            )
+        )
+    except KeyboardInterrupt:
+        print("\n[!] Interrupted by user.", file=sys.stderr)
+        return EXIT_INTERRUPTED
+
+    finished = utcnow()
