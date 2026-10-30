@@ -41,3 +41,40 @@ SERVICES: dict[int, str] = {
 
 _TLS_PORTS = {443, 8443, 636, 993, 995, 465, 990}
 _HTTP_PORTS = {80, 8000, 8008, 8080, 8081, 8888, 5000, 9000, 9090}
+
+
+def service_for_port(port: int) -> str:
+    """Return a best-effort service name for a port."""
+    return SERVICES.get(port, "unknown")
+
+
+async def grab_banner(host: str, port: int, timeout: float) -> str:
+    """
+    Best-effort banner grab. Never raises — returns "" if nothing is read.
+    """
+    # --- TLS ports -----------------------------------------------------
+    if port in _TLS_PORTS:
+        try:
+            ctx = ssl.create_default_context()
+            ctx.check_hostname = False
+            ctx.verify_mode = ssl.CERT_NONE
+            reader, writer = await asyncio.wait_for(
+                asyncio.open_connection(host, port, ssl=ctx),
+                timeout=timeout,
+            )
+            sslobj = writer.get_extra_info("ssl_object")
+            if sslobj is not None:
+                version = sslobj.version() or "?"
+                cipher = sslobj.cipher()
+                cipher_name = cipher[0] if cipher else "?"
+                banner = f"TLS {version} / {cipher_name}"
+            else:
+                banner = ""
+            writer.close()
+            try:
+                await writer.wait_closed()
+            except Exception:
+                pass
+            return safe_truncate(banner, MAX_BANNER_LENGTH)
+        except Exception:
+            return ""
