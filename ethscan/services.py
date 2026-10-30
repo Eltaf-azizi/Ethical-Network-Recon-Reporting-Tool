@@ -114,3 +114,51 @@ async def grab_banner(host: str, port: int, timeout: float) -> str:
                     banner = data.decode("utf-8", errors="ignore").strip()
             except Exception:
                 pass
+
+        # 3) Redis PING (safe, read-only)
+        if not banner and port == 6379:
+            try:
+                writer.write(b"PING\r\n")
+                await writer.drain()
+                data = await asyncio.wait_for(reader.read(256), timeout=timeout)
+                if data:
+                    banner = data.decode("utf-8", errors="ignore").strip()
+            except Exception:
+                pass
+
+        # 4) Generic nudge
+        if not banner:
+            try:
+                writer.write(b"\r\n")
+                await writer.drain()
+                data = await asyncio.wait_for(reader.read(1024), timeout=1.0)
+                if data:
+                    banner = data.decode("utf-8", errors="ignore").strip()
+            except Exception:
+                pass
+    finally:
+        try:
+            writer.close()
+            await writer.wait_closed()
+        except Exception:
+            pass
+
+    return safe_truncate(banner, MAX_BANNER_LENGTH)
+
+
+_OS_MARKERS: dict[str, str] = {
+    "ubuntu": "Ubuntu",
+    "debian": "Debian",
+    "centos": "CentOS",
+    "red hat": "Red Hat",
+    "rhel": "Red Hat",
+    "fedora": "Fedora",
+    "alpine": "Alpine",
+    "windows": "Windows",
+    "microsoft": "Windows",
+    "freebsd": "FreeBSD",
+    "openbsd": "OpenBSD",
+    "netbsd": "NetBSD",
+    "darwin": "macOS",
+    "linux": "Linux",
+}
