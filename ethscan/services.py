@@ -78,3 +78,39 @@ async def grab_banner(host: str, port: int, timeout: float) -> str:
             return safe_truncate(banner, MAX_BANNER_LENGTH)
         except Exception:
             return ""
+
+
+    # --- Plain TCP -----------------------------------------------------
+    try:
+        reader, writer = await asyncio.wait_for(
+            asyncio.open_connection(host, port), timeout=timeout
+        )
+    except Exception:
+        return ""
+
+    banner = ""
+    try:
+        # 1) Passive read (SSH, SMTP, FTP, MySQL, ...)
+        try:
+            data = await asyncio.wait_for(
+                reader.read(2048), timeout=min(timeout, 1.5)
+            )
+            if data:
+                banner = data.decode("utf-8", errors="ignore").strip()
+        except asyncio.TimeoutError:
+            pass
+
+        # 2) HTTP probe
+        if not banner and port in _HTTP_PORTS:
+            try:
+                writer.write(
+                    b"HEAD / HTTP/1.1\r\nHost: "
+                    + host.encode("utf-8", errors="ignore")
+                    + b"\r\nConnection: close\r\n\r\n"
+                )
+                await writer.drain()
+                data = await asyncio.wait_for(reader.read(2048), timeout=timeout)
+                if data:
+                    banner = data.decode("utf-8", errors="ignore").strip()
+            except Exception:
+                pass
