@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Recon Report — {{ report.target }}</title>
+
+</head>
+<body>
+<div class="wrap">
+  {% include "partials/header.html.j2" %}
+  {% include "partials/summary.html.j2" %}
+  {% include "partials/authorization.html.j2" %}
+
+  {% if report.os_hint %}
+    {% include "partials/os_hint.html.j2" %}
+  {% endif %}
+
+  {% include "partials/open_ports.html.j2" %}
+  {% include "partials/full_results.html.j2" %}
+  {% include "partials/methodology.html.j2" %}
+  {% include "partials/ethics.html.j2" %}
+  {% include "partials/footer.html.j2" %}
+</div>
+</body>
+</html>
