@@ -162,3 +162,48 @@ _OS_MARKERS: dict[str, str] = {
     "darwin": "macOS",
     "linux": "Linux",
 }
+
+
+
+def infer_os(results) -> dict | None:
+    """
+    Very basic OS hint from banners. Returns None if there's no evidence.
+    """
+    evidence: list[str] = []
+    seen: set[str] = set()
+
+    for r in results:
+        if getattr(r, "state", None) != "open" or not getattr(r, "banner", ""):
+            continue
+        lowered = r.banner.lower()
+        for key, label in _OS_MARKERS.items():
+            if key in lowered and label not in seen:
+                seen.add(label)
+                evidence.append(f"Port {r.port} banner contains '{key}'")
+
+    if not evidence:
+        return None
+
+    if "Windows" in seen:
+        family, confidence = "Windows", "low"
+    elif "Ubuntu" in seen:
+        family, confidence = "Linux (Ubuntu)", "medium"
+    elif "Debian" in seen:
+        family, confidence = "Linux (Debian)", "medium"
+    elif {"Red Hat", "CentOS", "Fedora"} & seen:
+        family, confidence = "Linux (RHEL-family)", "medium"
+    elif {"FreeBSD", "OpenBSD", "NetBSD"} & seen:
+        family, confidence = "BSD", "medium"
+    elif "macOS" in seen:
+        family, confidence = "macOS", "low"
+    elif "Linux" in seen:
+        family, confidence = "Linux", "low"
+    else:
+        family, confidence = "Unknown", "low"
+
+    return {
+        "family": family,
+        "confidence": confidence,
+        "ttl": None,  # requires raw sockets / root; deliberately omitted
+        "evidence": evidence,
+    }
