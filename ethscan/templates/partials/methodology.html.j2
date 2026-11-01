@@ -1,0 +1,16 @@
+<section>
+  <h2>Methodology</h2>
+  <ul style="margin:0;padding-left:20px">
+    <li><strong>Technique:</strong> asynchronous TCP connect scan (full three-way handshake).</li>
+    <li><strong>Timeout per port:</strong> {{ report.options.timeout }}s</li>
+    <li><strong>Concurrency:</strong> {{ report.options.concurrency }} simultaneous connections</li>
+    <li><strong>Rate limit:</strong> {{ report.options.rate }} connection attempts/second (token bucket)</li>
+    <li><strong>Banner grabbing:</strong> {{ 'enabled' if report.options.banners else 'disabled' }}</li>
+    <li><strong>Port range:</strong> <code>{{ report.options.port_spec }}</code></li>
+  </ul>
+  <p class="muted" style="font-size:12.5px;margin-top:10px">
+    A connect scan is logged by the target's own TCP stack and may appear in
+    application or firewall logs. Only run it against systems you own or are
+    explicitly authorised to test.
+  </p>
+</section>
