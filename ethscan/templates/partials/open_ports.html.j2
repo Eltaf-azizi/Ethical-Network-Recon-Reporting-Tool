@@ -1,0 +1,27 @@
+<section>
+  <h2>Open Ports &amp; Services</h2>
+  {% if open_results %}
+    <table>
+      <thead>
+        <tr>
+          <th style="width:80px">Port</th>
+          <th style="width:150px">Service</th>
+          <th style="width:180px">Version / Detail</th>
+          <th>Banner</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in open_results %}
+          <tr>
+            <td><strong>{{ r.port }}</strong></td>
+            <td>{{ r.service or 'unknown' }}</td>
+            <td>{{ r.version or '—' }}</td>
+            <td><code>{{ r.banner or '—' }}</code></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="muted">No open ports were found in the scanned range.</p>
+  {% endif %}
+</section>
