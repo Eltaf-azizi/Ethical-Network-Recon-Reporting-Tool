@@ -1,0 +1,26 @@
+<section>
+  <h2>Operating System Hint</h2>
+  <table>
+    <tr>
+      <th style="width:190px">Likely family</th>
+      <td>{{ report.os_hint.family }}
+          <span class="muted">(confidence: {{ report.os_hint.confidence }})</span></td>
+    </tr>
+    {% if report.os_hint.ttl %}
+      <tr><th>Observed TTL</th><td>{{ report.os_hint.ttl }}</td></tr>
+    {% endif %}
+    <tr>
+      <th>Evidence</th>
+      <td>
+        {% if report.os_hint.evidence %}
+          <ul style="margin:0;padding-left:18px">
+            {% for e in report.os_hint.evidence %}<li>{{ e }}</li>{% endfor %}
+          </ul>
+        {% else %}<span class="muted">none</span>{% endif %}
+      </td>
+    </tr>
+  </table>
+  <p class="muted" style="font-size:12.5px;margin-top:10px">
+    TTL and banner heuristics are approximate. This is a hint, not a fingerprint.
+  </p>
+</section>
