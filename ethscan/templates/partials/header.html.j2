@@ -1,0 +1,13 @@
+<header class="hero">
+  <h1>Network Reconnaissance Report</h1>
+  <div class="sub">
+    Target <strong>{{ report.target }}</strong>
+    {% if report.resolved_ip %} · {{ report.resolved_ip }}{% endif %}
+    · Generated {{ report.finished.strftime('%Y-%m-%d %H:%M:%S UTC') }}
+  </div>
+  <div>
+    <span class="badge">ethscan v{{ report.tool_version }}</span>
+    <span class="badge">{{ report.duration_seconds }}s duration</span>
+    <span class="badge">{{ report.results|length }} ports probed</span>
+  </div>
+</header>
