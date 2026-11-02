@@ -1,0 +1,33 @@
+<section>
+  <h2>Full Results</h2>
+  <details>
+    <summary>Show all {{ report.results|length }} probed ports</summary>
+    <table style="margin-top:12px">
+      <thead>
+        <tr>
+          <th style="width:80px">Port</th>
+          <th style="width:110px">State</th>
+          <th style="width:110px">Latency</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in report.results %}
+          <tr>
+            <td>{{ r.port }}</td>
+            <td><span class="pill {{ r.state }}">{{ r.state }}</span></td>
+            <td>
+              {% if r.latency_ms is not none %}
+                {{ '%.1f'|format(r.latency_ms) }} ms
+              {% else %}—{% endif %}
+            </td>
+            <td>
+              {% if r.error %}<code>{{ r.error }}</code>
+              {% else %}<span class="muted">—</span>{% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </details>
+</section>
