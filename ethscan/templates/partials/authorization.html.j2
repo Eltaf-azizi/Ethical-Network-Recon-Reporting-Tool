@@ -1,0 +1,33 @@
+<section>
+  <h2>Authorization &amp; Scope</h2>
+  {% if report.scope.loopback %}
+    <div class="notice ok">
+      <strong>Loopback target.</strong> {{ report.target }} is on this machine.
+      Scanning it cannot affect any third party.
+    </div>
+  {% else %}
+    <div class="notice ok">
+      <strong>Explicit authorization asserted.</strong>
+      The operator supplied <code>--authorized</code> and the target matched
+      the supplied scope file.
+    </div>
+  {% endif %}
+  <table>
+    <tr><th style="width:190px">Authorized by</th><td>{{ report.scope.authorized_by or '—' }}</td></tr>
+    <tr><th>Issued</th><td>{{ report.scope.issued or '—' }}</td></tr>
+    <tr><th>Expires</th><td>{{ report.scope.expires or 'no expiry recorded' }}</td></tr>
+    <tr><th>Scope source</th><td><code>{{ report.scope.source or '— (loopback)' }}</code></td></tr>
+    <tr>
+      <th>Declared targets</th>
+      <td>
+        {% if report.scope.targets %}
+          <code>{{ report.scope.targets|join(', ') }}</code>
+        {% else %}—{% endif %}
+      </td>
+    </tr>
+  </table>
+  {% if report.scope.consent %}
+    <p class="muted" style="margin-top:14px;font-size:13px"><strong>Consent statement</strong></p>
+    <pre>{{ report.scope.consent }}</pre>
+  {% endif %}
+</section>
