@@ -56,3 +56,37 @@ class _DummyServer:
             self.sock.close()
         except Exception:
             pass
+
+
+@pytest.fixture
+def dummy_ssh():
+    srv = _DummyServer(b"SSH-2.0-OpenSSH_8.9p1 Ubuntu-3ubuntu0.4\r\n").start()
+    yield srv
+    srv.stop()
+
+
+@pytest.fixture
+def dummy_http():
+    srv = _DummyServer(
+        b"HTTP/1.1 200 OK\r\nServer: nginx/1.24.0 (Ubuntu)\r\n\r\n",
+        mode="active",
+    ).start()
+    yield srv
+    srv.stop()
+
+
+@pytest.fixture
+def dummy_redis():
+    srv = _DummyServer(b"+PONG\r\n", mode="active").start()
+    yield srv
+    srv.stop()
+
+
+@pytest.fixture
+def closed_port():
+    """Return a port that is almost certainly closed on a dev machine."""
+    s = socket.socket()
+    s.bind(("127.0.0.1", 0))
+    p = s.getsockname()[1]
+    s.close()
+    return p
