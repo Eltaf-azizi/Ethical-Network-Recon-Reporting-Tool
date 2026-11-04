@@ -24,3 +24,35 @@ def test_invalid_port_spec(capsys):
     assert code == 2
     assert "invalid" in captured.err.lower() or "spec" in captured.err.lower()
 
+
+def test_loopback_scan_writes_report(tmp_path, dummy_ssh):
+    out = tmp_path / "out.html"
+    code = main(
+        [
+            "127.0.0.1",
+            "-p", str(dummy_ssh.port),
+            "--authorized",
+            "--no-banners",
+            "-o", str(out),
+        ]
+    )
+    assert code == 0
+    assert out.is_file()
+    assert "Network Reconnaissance Report" in out.read_text()
+
+
+def test_json_output(tmp_path, dummy_ssh):
+    out = tmp_path / "out.html"
+    js = tmp_path / "out.json"
+    code = main(
+        [
+            "127.0.0.1",
+            "-p", str(dummy_ssh.port),
+            "--authorized",
+            "--no-banners",
+            "-o", str(out),
+            "--json", str(js),
+        ]
+    )
+    assert code == 0
+    assert js.is_file()
