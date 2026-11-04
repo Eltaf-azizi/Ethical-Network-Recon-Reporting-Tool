@@ -49,3 +49,24 @@ def load_scope(scope_path: str | Path) -> dict:
         raise ValueError("scope 'targets' must be a list of strings")
 
     return data
+
+
+def scope_covers(scope: dict, target: str) -> bool:
+    """Exact string match against the scope's targets list."""
+    return target in scope.get("targets", [])
+
+
+def scope_is_expired(scope: dict) -> bool:
+    """Return True if the scope has an 'expires' field that is in the past."""
+    raw = scope.get("expires")
+    if not raw:
+        return False
+    try:
+        when = datetime.fromisoformat(str(raw).replace("Z", "+00:00"))
+        if when.tzinfo is None:
+            when = when.replace(tzinfo=timezone.utc)
+        return when < datetime.now(timezone.utc)
+    except Exception:
+        # Malformed date: don't block on it, but the CLI could warn.
+        return False
+
