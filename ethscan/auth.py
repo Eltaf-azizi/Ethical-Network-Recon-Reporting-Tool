@@ -70,3 +70,67 @@ def scope_is_expired(scope: dict) -> bool:
         # Malformed date: don't block on it, but the CLI could warn.
         return False
 
+
+def check_authorization(
+    target: str,
+    authorized_flag: bool,
+    scope_path: str | None,
+) -> tuple[bool, dict | str]:
+    """
+    Returns (allowed, scope_info).
+
+    On refusal, `scope_info` is a string explaining why.
+    On success, `scope_info` is a dict describing the authorization.
+    """
+    if not authorized_flag:
+        return False, (
+            "Refusing to run: missing --authorized flag.\n"
+            "You must explicitly assert that you own this target or have "
+            "written permission to test it."
+        )
+
+    if is_loopback(target):
+        return True, {
+            "loopback": True,
+            "authorized_by": "loopback",
+            "issued": "",
+            "expires": "",
+            "source": "",
+            "targets": [],
+            "consent": (
+                "Loopback target: this is your own machine. Scanning it cannot "
+                "affect any third party."
+            ),
+        }
+
+    if not scope_path:
+        return False, (
+            "Refusing to run: non-loopback target requires --scope <file>.\n"
+            "A scope file must list the target and describe your authorization."
+        )
+
+    try:
+        scope = load_scope(scope_path)
+    except Exception as e:
+        return False, f"Refusing to run: could not load scope file: {e}"
+
+    if not scope_covers(scope, target):
+        return False, (
+            f"Refusing to run: target '{target}' is not listed in the scope file.\n"
+            f"Allowed targets: {scope.get('targets', [])}"
+        )
+
+    if scope_is_expired(scope):
+        return False, (
+            f"Refusing to run: scope expired on {scope.get('expires')}."
+        )
+
+    return True, {
+        "loopback": False,
+        "authorized_by": scope.get("authorized_by", ""),
+        "issued": scope.get("issued", ""),
+        "expires": scope.get("expires", ""),
+        "source": str(scope_path),
+        "targets": scope.get("targets", []),
+        "consent": scope.get("consent", ""),
+    }
