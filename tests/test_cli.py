@@ -56,3 +56,4 @@ def test_json_output(tmp_path, dummy_ssh):
     )
     assert code == 0
     assert js.is_file()
+    
