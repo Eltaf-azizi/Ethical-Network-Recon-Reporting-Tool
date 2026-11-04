@@ -26,3 +26,26 @@ def is_loopback(target: str) -> bool:
     if ip in LOOPBACK_IPS:
         return True
     return ip.startswith("127.")
+
+
+
+def load_scope(scope_path: str | Path) -> dict:
+    """Load and validate a scope file. Raises on any structural problem."""
+    path = Path(scope_path)
+    if not path.is_file():
+        raise FileNotFoundError(f"scope file not found: {scope_path}")
+
+    with path.open("r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    if not isinstance(data, dict):
+        raise ValueError("scope file must be a JSON object")
+
+    targets = data.get("targets")
+    if not isinstance(targets, list) or not targets:
+        raise ValueError("scope file must contain a non-empty 'targets' list")
+
+    if not all(isinstance(t, str) for t in targets):
+        raise ValueError("scope 'targets' must be a list of strings")
+
+    return data
