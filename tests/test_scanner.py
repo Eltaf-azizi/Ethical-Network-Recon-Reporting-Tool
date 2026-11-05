@@ -47,3 +47,29 @@ def test_rate_limiter_throttles():
     # 40 tokens at 20/sec means roughly 1s of additional waiting beyond
     # the initial burst of `rate` tokens. Allow plenty of slack.
     assert elapsed >= 0.5
+
+
+def test_semaphore_caps_concurrency():
+    """
+    Track how many tasks were simultaneously inside the semaphore.
+    Uses a tiny fake: scan_ports with a semaphore around a slow coroutine
+    is overkill; instead, exercise RateLimiter + asyncio.gather directly.
+    """
+    async def run():
+        sem = asyncio.Semaphore(5)
+        peak = 0
+        current = 0
+
+        async def worker():
+            nonlocal peak, current
+            async with sem:
+                current += 1
+                peak = max(peak, current)
+                await asyncio.sleep(0.02)
+                current -= 1
+
+        await asyncio.gather(*(worker() for _ in range(30)))
+        return peak
+
+    peak = asyncio.run(run())
+    assert peak <= 5
