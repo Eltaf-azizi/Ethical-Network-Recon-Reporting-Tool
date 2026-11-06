@@ -51,3 +51,31 @@ def serve(port: int, banner: bytes, mode: str = "passive") -> None:
 
         threading.Thread(target=handle, daemon=True).start()
 
+
+
+if __name__ == "__main__":
+    threads = [
+        threading.Thread(
+            target=serve,
+            args=(2222, b"SSH-2.0-OpenSSH_8.9p1 Ubuntu-3ubuntu0.4\r\n", "passive"),
+            daemon=True,
+        ),
+        threading.Thread(
+            target=serve,
+            args=(8080, b"HTTP/1.1 200 OK\r\nServer: nginx/1.24.0 (Ubuntu)\r\n\r\n", "active"),
+            daemon=True,
+        ),
+        threading.Thread(
+            target=serve,
+            args=(6379, b"+PONG\r\n", "active"),
+            daemon=True,
+        ),
+    ]
+    for t in threads:
+        t.start()
+
+    print("[dummy] press Ctrl+C to stop")
+    try:
+        threading.Event().wait()
+    except KeyboardInterrupt:
+        print("\n[dummy] bye")
