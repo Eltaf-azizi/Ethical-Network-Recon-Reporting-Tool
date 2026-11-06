@@ -20,4 +20,22 @@ def _make_report():
         ScanResult(port=443, state="filtered", error="timeout"),
         ScanResult(port=9999, state="error", error="network unreachable"),
     ]
-    
+
+    return build_report_data(
+        target="127.0.0.1",
+        resolved_ip="127.0.0.1",
+        started=started,
+        finished=finished,
+        results=results,
+        scope_info={
+            "loopback": True, "authorized_by": "loopback",
+            "issued": "", "expires": "", "source": "",
+            "targets": [], "consent": "",
+        },
+        os_hint={"family": "Linux (Ubuntu)", "confidence": "medium",
+                 "ttl": None, "evidence": ["Port 22 banner contains 'ubuntu'"]},
+        options={"timeout": 1.0, "concurrency": 200, "rate": 500.0,
+                 "banners": True, "port_spec": "22,80,443,9999"},
+        tool_version="1.0.0",
+    )
+
