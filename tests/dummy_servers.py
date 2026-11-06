@@ -19,3 +19,35 @@ def serve(port: int, banner: bytes, mode: str = "passive") -> None:
     srv.bind(("127.0.0.1", port))
     srv.listen(16)
     print(f"[dummy] listening on 127.0.0.1:{port} ({mode})")
+
+
+    while True:
+        try:
+            conn, _ = srv.accept()
+        except OSError:
+            break
+
+        def handle(c=conn):
+            try:
+                if mode == "active":
+                    c.settimeout(2.0)
+                    try:
+                        c.recv(1024)
+                    except Exception:
+                        pass
+                    c.sendall(banner)
+                else:
+                    c.sendall(banner)
+                    c.settimeout(1.0)
+                    try:
+                        c.recv(64)
+                    except Exception:
+                        pass
+            finally:
+                try:
+                    c.close()
+                except Exception:
+                    pass
+
+        threading.Thread(target=handle, daemon=True).start()
+
