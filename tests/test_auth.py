@@ -45,3 +45,41 @@ def test_scope_must_cover_target():
         assert "not listed" in reason.lower()
     finally:
         Path(path).unlink()
+
+
+def test_scope_expired_is_refused():
+    with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as f:
+        json.dump(
+            {
+                "targets": ["10.0.0.1"],
+                "authorized_by": "x",
+                "expires": "2000-01-01",
+            },
+            f,
+        )
+        path = f.name
+    try:
+        ok, reason = check_authorization("10.0.0.1", True, path)
+        assert not ok
+        assert "expired" in reason.lower()
+    finally:
+        Path(path).unlink()
+
+
+def test_valid_scope_is_allowed():
+    with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as f:
+        json.dump(
+            {
+                "targets": ["10.0.0.1"],
+                "authorized_by": "Eltaf",
+                "expires": "2999-01-01",
+            },
+            f,
+        )
+        path = f.name
+    try:
+        ok, info = check_authorization("10.0.0.1", True, path)
+        assert ok
+        assert info["authorized_by"] == "Eltaf"
+    finally:
+        Path(path).unlink()
