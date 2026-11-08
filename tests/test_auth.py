@@ -83,3 +83,26 @@ def test_valid_scope_is_allowed():
         assert info["authorized_by"] == "Eltaf"
     finally:
         Path(path).unlink()
+
+
+
+def test_load_scope_rejects_missing_targets():
+    with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as f:
+        f.write("{}")
+        path = f.name
+    try:
+        try:
+            load_scope(path)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("expected ValueError")
+    finally:
+        Path(path).unlink()
+
+
+def test_scope_helpers():
+    scope = {"targets": ["a"], "expires": "2000-01-01"}
+    assert scope_covers(scope, "a")
+    assert not scope_covers(scope, "b")
+    assert scope_is_expired(scope)
