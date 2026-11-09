@@ -1,0 +1,7 @@
+{
+  "authorized_by": "Eltaf (owner)",
+  "issued": "2025-01-01",
+  "expires": "2030-12-31",
+  "targets": ["10.0.0.1"],
+  "consent": "Does not include the target under test."
+}
