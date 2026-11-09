@@ -1,0 +1,9 @@
+{
+  "target": "127.0.0.1",
+  "resolved_ip": "127.0.0.1",
+  "results": [
+    {"port": 22, "state": "open", "latency_ms": 12.3, "service": "ssh", "banner": "SSH-2.0-OpenSSH_8.9p1 Ubuntu"},
+    {"port": 80, "state": "closed", "error": "connection refused"},
+    {"port": 443, "state": "filtered", "error": "timeout"}
+  ]
+}
