@@ -1,0 +1,7 @@
+{
+  "authorized_by": "Eltaf (owner)",
+  "issued": "2000-01-01",
+  "expires": "2000-12-31",
+  "targets": ["192.168.56.10"],
+  "consent": "Expired test scope."
+}
