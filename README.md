@@ -36,3 +36,17 @@ I wanted to build the next version properly:
 And most importantly, I wanted a tool that cannot be used accidentally. That's why --authorized is mandatory. That's why non-loopback targets need a scope file. That's why the gate runs before DNS resolution, not after.
 
 This is a learning project. It is not a replacement for nmap. But it is a complete, working, honest tool with an ethics frame built into the design.
+
+
+## What it does
+ - Async TCP connect scanning over a configurable port range (1-1024, 22,80,443, or 8000-8100, or any mix)
+ - Service detection for ~70 common ports via a built-in table
+ - Banner grabbing for SSH, HTTP, HTTPS/TLS, Redis, and generic TCP services
+ - Basic OS hint derived from banner substrings, with confidence level and evidence shown in the report
+ - Mandatory --authorized flag — the tool refuses to run without it
+ - Scope file enforcement for non-loopback targets — the target must be listed by name
+ - Rate limiting (token bucket) plus a semaphore to cap concurrency
+ - HTML report with autoescaped output, methodology section, and full ethics section
+ - Optional JSON export for downstream tooling
+ - Test suite with safe local dummy servers so you can verify without scanning anything you don't own
+ 
