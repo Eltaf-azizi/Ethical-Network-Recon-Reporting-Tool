@@ -50,3 +50,14 @@ This is a learning project. It is not a replacement for nmap. But it is a comple
  - Optional JSON export for downstream tooling
  - Test suite with safe local dummy servers so you can verify without scanning anything you don't own
  
+
+## what it deliberately does not do
+I want to be upfront about the things I left out, because each one is a deliberate choice:
+
+ - No SYN (half-open) scan. That requires raw sockets and root privileges, and it's more aggressive on the target. Connect scan is honest: it uses the same primitives any application uses.
+
+ - No OS fingerprinting beyond banner heuristics. Nmap-style TCP/IP fingerprinting is a rabbit hole, and I'd rather under-promise than ship a "hint" that pretends to be a fingerprint.
+
+ - No exploit attempts. No payloads. No credential guessing. Those things turn a reconnaissance tool into an attack tool, and that's exactly what I wanted to avoid.
+
+Every omission above is documented in `docs/ethics.md` with the reasoning.
