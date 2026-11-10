@@ -61,3 +61,24 @@ I want to be upfront about the things I left out, because each one is a delibera
  - No exploit attempts. No payloads. No credential guessing. Those things turn a reconnaissance tool into an attack tool, and that's exactly what I wanted to avoid.
 
 Every omission above is documented in `docs/ethics.md` with the reasoning.
+
+
+## Demo
+### Refusal (the point of the project)
+```
+text
+PS> python -m ethscan 127.0.0.1 -p 80
+[!] Refusing to run: missing --authorized flag.
+You must explicitly assert that you own this target or have written permission to test it.
+```
+Exit code: 2.
+
+### Loopback scan
+```
+text
+PS> python -m ethscan 127.0.0.1 -p 22,80,443,2222,6379,8080 --authorized -o reports\local.html
+[*] Scanning 127.0.0.1 (127.0.0.1) — 6 port(s)
+[*] timeout=1.0s concurrency=200 rate=500.0/s banners=on
+[+] HTML report written: reports\local.html
+[+] Done in 0.42s — open=3 closed=3 filtered=0 error=0
+```
