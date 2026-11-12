@@ -82,3 +82,19 @@ PS> python -m ethscan 127.0.0.1 -p 22,80,443,2222,6379,8080 --authorized -o repo
 [+] HTML report written: reports\local.html
 [+] Done in 0.42s — open=3 closed=3 filtered=0 error=0
 ```
+
+## Authorized remote scan
+```bash
+python -m ethscan 192.168.56.10 -p 1-1024 --authorized \
+  --scope scope.json \
+  -o reports/vm.html --json reports/vm.json
+```
+The HTML report includes:
+
+ - Summary cards (open / closed / filtered / error)
+ - Authorization & scope section
+ - OS hint with evidence
+ - Open ports table with service names and banners
+ - Full results (collapsible)
+ - Methodology section
+ - Ethics & legal section
