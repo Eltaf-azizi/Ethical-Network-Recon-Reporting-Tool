@@ -119,3 +119,35 @@ pip install -r requirements-dev.txt
 ```
 **Windows note:** if your project folder path contains & (e.g., Recon & Reporting Tool), python -m venv will refuse to create the environment. Either move the project to a path without special characters (like C:\dev\ethscan), or skip the venv entirely — global pip install works fine for this project.
 
+
+## Quick start
+The fastest path to a working scan is loopback plus the built-in dummy servers.
+
+Terminal 1 — start safe local test services:
+
+```bash
+python tests/dummy_servers.py
+```
+You'll see:
+
+```text
+[dummy] listening on 127.0.0.1:2222 (passive)
+[dummy] listening on 127.0.0.1:8080 (active)
+[dummy] listening on 127.0.0.1:6379 (active)
+```
+Terminal 2 — scan them:
+
+```bash
+python -m ethscan 127.0.0.1 -p 22,80,443,2222,6379,8080 \
+  --authorized \
+  -o reports/local.html \
+  --json reports/local.json
+```
+Open the report:
+
+```bash
+start reports/local.html            # Windows
+xdg-open reports/local.html         # Linux
+open reports/local.html             # macOS
+```
+You should see three open ports: 2222 (ssh), 6379 (redis), 8080 (http-proxy), plus an OS hint reading "Linux (Ubuntu)" — because the dummy SSH and HTTP servers send Ubuntu-flavoured banners.
