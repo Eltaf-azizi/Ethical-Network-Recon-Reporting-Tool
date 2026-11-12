@@ -98,3 +98,13 @@ The HTML report includes:
  - Full results (collapsible)
  - Methodology section
  - Ethics & legal section
+
+## Requirements
+
+ - Python 3.10+ (tested on 3.10, 3.11, 3.12, 3.14)
+ - jinja2 for the report template
+ - Development: pytest, pytest-asyncio, ruff, mypy
+
+No system dependencies. No compilers. No Docker required (though Docker makes a great test target).
+
+
