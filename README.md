@@ -108,3 +108,14 @@ The HTML report includes:
 No system dependencies. No compilers. No Docker required (though Docker makes a great test target).
 
 
+## Installation
+```bash
+git clone https://github.com/<your-username>/ethscan.git
+cd ethscan
+
+python -m venv .venv
+source .venv/bin/activate            # Windows: .venv\Scripts\Activate.ps1
+pip install -r requirements-dev.txt
+```
+**Windows note:** if your project folder path contains & (e.g., Recon & Reporting Tool), python -m venv will refuse to create the environment. Either move the project to a path without special characters (like C:\dev\ethscan), or skip the venv entirely — global pip install works fine for this project.
+
