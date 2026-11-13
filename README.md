@@ -151,3 +151,10 @@ xdg-open reports/local.html         # Linux
 open reports/local.html             # macOS
 ```
 You should see three open ports: 2222 (ssh), 6379 (redis), 8080 (http-proxy), plus an OS hint reading "Linux (Ubuntu)" — because the dummy SSH and HTTP servers send Ubuntu-flavoured banners.
+
+## Usage
+### Refuse to run without --authorized
+```bash
+python -m ethscan 127.0.0.1 -p 80
+# exits with code 2 and an explanation
+```
