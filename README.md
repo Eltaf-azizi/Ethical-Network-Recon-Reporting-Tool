@@ -158,3 +158,25 @@ You should see three open ports: 2222 (ssh), 6379 (redis), 8080 (http-proxy), pl
 python -m ethscan 127.0.0.1 -p 80
 # exits with code 2 and an explanation
 ```
+
+## Scan loopback
+```bash
+python -m ethscan 127.0.0.1 -p 1-1024 --authorized -o reports/full.html
+```
+## Scan an authorized VM
+First copy the example scope file:
+
+```bash
+cp scope.example.json scope.json
+```
+Edit `scope.json` to list your VM's IP in the targets array. Then:
+
+```bash
+python -m ethscan 192.168.56.10 -p 1-1024 \
+  --authorized \
+  --scope scope.json \
+  -o reports/vm.html
+```
+If the target isn't in the scope file, the tool refuses. That's not a bug; it's the feature.
+
+
