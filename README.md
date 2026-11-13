@@ -179,4 +179,16 @@ python -m ethscan 192.168.56.10 -p 1-1024 \
 ```
 If the target isn't in the scope file, the tool refuses. That's not a bug; it's the feature.
 
+## Quiet scan (no banner grabbing)
+```bash
+python -m ethscan 127.0.0.1 -p 1-1024 --authorized --no-banners \
+  --rate 200 --concurrency 50
+```
+## Port spec syntax
 
+| Spec |	Meaning |
+|------|-----------|
+| `80`	| Single port |
+| `22,80,443` |	List |
+| `1-1024` |	Range |
+| `22,80,8000-8100` |	Mixed|
